@@ -39,6 +39,12 @@ Notenwart-Alltag: Ein Ordner voller Stücke als PDF, jedes mit allen Stimmen hin
 
 ![Großansicht](docs/screenshots/vorschau.png)
 
+*Die Notenzeilen in den Screenshots sind unkenntlich gemacht. Die gezeigten Noten sind urheberrechtlich geschützte Verlagsausgaben; nur Titel und Stimmenbezeichnung sind sichtbar, um die Funktion zu zeigen.*
+
+## Hinweis zum Urheberrecht
+
+Stimmenauszug verändert oder vervielfältigt keine Noten über das hinaus, was du selbst tust: Es kopiert Seiten aus deinen eigenen PDFs in eine neue Datei. Ob du die Ergebnisse weitergeben darfst, richtet sich nach den Lizenzbedingungen der jeweiligen Verlagsausgabe. Für den Einsatz im Verein gilt üblicherweise: Kopien und Auszüge nur für Stücke, die der Verein rechtmäßig erworben hat, und nur für die eigenen Musikerinnen und Musiker. Im Zweifel beim Verlag oder beim Verband (in Deutschland z.B. über die BDMV-Rahmenverträge mit der GEMA und der VG Musikedition) nachfragen.
+
 ## Installation
 
 Fertige Builds liegen unter [Releases](../../releases). Die App ist nicht signiert, deshalb warnen Windows und macOS beim ersten Start einmalig. Die Schritte dazu stehen in [docs/INSTALLATION.md](docs/INSTALLATION.md).
