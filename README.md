@@ -82,6 +82,12 @@ npm run dev
 | `npm run build` | Renderer, Preload und Hauptprozess bauen |
 | `npm run dist` | macOS- und Windows-Installer erzeugen, beide auf dem Mac |
 
+Ein Release entsteht automatisch, sobald ein Versions-Tag gepusht wird. GitHub Actions baut dann beide Plattformen und hängt die Installer an das Release:
+
+```bash
+git tag v0.1.0 && git push origin v0.1.0
+```
+
 Testlauf ohne Oberfläche:
 
 ```bash

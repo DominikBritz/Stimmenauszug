@@ -1,14 +1,16 @@
 name: Release
 
-# Bei jedem Push auf main: Tests, Build für macOS (arm64) und Windows (x64) auf einem
-# macOS-Runner, dann ein GitHub-Release v0.1.<Laufnummer> mit den Installern.
+# Läuft nur bei einem Versions-Tag (z.B. v0.1.0): Tests, Build für macOS (arm64) und
+# Windows (x64) auf einem macOS-Runner, dann ein GitHub-Release mit den Installern.
+#   git tag v0.1.0 && git push origin v0.1.0
 on:
   push:
-    branches: [main]
-    paths-ignore:
-      - '**.md'
-      - 'docs/**'
+    tags: ['v*']
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version ohne v, z.B. 0.1.0'
+        required: true
 
 permissions:
   contents: write
@@ -35,12 +37,15 @@ jobs:
           # Falls Install-Skripte blockiert wurden: Electron-Binary nachladen
           [ -d node_modules/electron/dist ] || node node_modules/electron/install.js
 
-      - name: Version setzen
+      - name: Version aus Tag übernehmen
         id: version
         run: |
-          BASE=$(node -p "require('./package.json').version.split('.').slice(0,2).join('.')")
-          VERSION="${BASE}.${{ github.run_number }}"
-          npm version "$VERSION" --no-git-tag-version
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION="${GITHUB_REF_NAME#v}"
+          fi
+          npm version "$VERSION" --no-git-tag-version --allow-same-version
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Tests
