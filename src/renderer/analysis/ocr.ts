@@ -9,7 +9,7 @@ const BASE = new URL('/', document.baseURI).href; // http://localhost:5173/ oder
 async function makeWorker(): Promise<Worker> {
   const worker = await createWorker('deu+eng', 1, {
     workerPath: BASE + 'tesseract/worker.min.js',
-    corePath: BASE + 'tesseract/',
+    corePath: BASE + 'tesseract/tesseract-core-relaxedsimd-lstm.wasm.js',
     langPath: BASE + 'tessdata/',
     workerBlobURL: false,
     cacheMethod: 'none',
