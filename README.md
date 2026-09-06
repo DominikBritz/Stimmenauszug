@@ -54,8 +54,8 @@ Fertige Builds liegen unter [Releases](../../releases). Die App ist nicht signie
 | Plattform | Datei |
 |---|---|
 | macOS (Apple Silicon) | `Stimmenauszug-<Version>-arm64.dmg` |
-| Windows (64 Bit), Installer | `Stimmenauszug Setup <Version>.exe` |
-| Windows (64 Bit), portabel | `Stimmenauszug <Version>.exe` |
+| Windows (64 Bit), Installer | `Stimmenauszug-Setup-<Version>.exe` |
+| Windows (64 Bit), portabel | `Stimmenauszug-Portable-<Version>.exe` |
 
 ## Wie die Erkennung arbeitet
 

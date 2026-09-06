@@ -71,8 +71,8 @@ jobs:
             | Plattform | Datei |
             |---|---|
             | macOS (Apple Silicon) | `Stimmenauszug-${{ steps.version.outputs.version }}-arm64.dmg` |
-            | Windows Installer | `Stimmenauszug Setup ${{ steps.version.outputs.version }}.exe` |
-            | Windows portabel | `Stimmenauszug ${{ steps.version.outputs.version }}.exe` |
+            | Windows Installer | `Stimmenauszug-Setup-${{ steps.version.outputs.version }}.exe` |
+            | Windows portabel | `Stimmenauszug-Portable-${{ steps.version.outputs.version }}.exe` |
           files: |
             dist/*.dmg
             dist/*.exe

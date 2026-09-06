@@ -20,8 +20,8 @@ Alternative ohne Terminal: In *Systemeinstellungen > Datenschutz & Sicherheit* n
 
 Zwei Varianten liegen bei:
 
-- `Stimmenauszug Setup <Version>.exe`: Installer, legt Startmenü-Eintrag an.
-- `Stimmenauszug <Version>.exe`: portable Version, läuft direkt ohne Installation (z.B. vom USB-Stick).
+- `Stimmenauszug-Setup-<Version>.exe`: Installer, legt Startmenü-Eintrag an.
+- `Stimmenauszug-Portable-<Version>.exe`: portable Version, läuft direkt ohne Installation (z.B. vom USB-Stick).
 
 Beim ersten Start zeigt Windows SmartScreen „Der Computer wurde durch Windows geschützt“. Auf **Weitere Informationen** klicken, dann **Trotzdem ausführen**.
 
