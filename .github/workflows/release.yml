@@ -1,0 +1,73 @@
+name: Release
+
+# Bei jedem Push auf main: Tests, Build für macOS (arm64) und Windows (x64) auf einem
+# macOS-Runner, dann ein GitHub-Release v0.1.<Laufnummer> mit den Installern.
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: macos-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Abhängigkeiten installieren
+        run: |
+          npm ci
+          # Falls Install-Skripte blockiert wurden: Electron-Binary nachladen
+          [ -d node_modules/electron/dist ] || node node_modules/electron/install.js
+
+      - name: Version setzen
+        id: version
+        run: |
+          BASE=$(node -p "require('./package.json').version.split('.').slice(0,2).join('.')")
+          VERSION="${BASE}.${{ github.run_number }}"
+          npm version "$VERSION" --no-git-tag-version
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Installer erzeugen (macOS + Windows)
+        run: npx electron-builder --mac --win --publish never
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+
+      - name: Release veröffentlichen
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: Stimmenauszug ${{ steps.version.outputs.version }}
+          generate_release_notes: true
+          body: |
+            Unsignierte Builds. Hinweise zum ersten Start: [docs/INSTALLATION.md](https://github.com/${{ github.repository }}/blob/main/docs/INSTALLATION.md)
+
+            | Plattform | Datei |
+            |---|---|
+            | macOS (Apple Silicon) | `Stimmenauszug-${{ steps.version.outputs.version }}-arm64.dmg` |
+            | Windows Installer | `Stimmenauszug Setup ${{ steps.version.outputs.version }}.exe` |
+            | Windows portabel | `Stimmenauszug ${{ steps.version.outputs.version }}.exe` |
+          files: |
+            dist/*.dmg
+            dist/*.exe
