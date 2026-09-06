@@ -1,8 +1,63 @@
-# Stimmenauszug
+<p align="center">
+  <img src="build/icon.png" width="96" alt="Stimmenauszug">
+</p>
 
-Desktop-App (macOS, Windows), die aus Noten-PDFs einzelne Stimmen herauszieht: PDFs oder Ordner auswählen, „Trompete 1“ eingeben, und die App sucht in allen Dateien die passenden Seiten und exportiert sie in eine neue PDF (mit Lesezeichen pro Stück).
+<h1 align="center">Stimmenauszug</h1>
 
-Funktioniert mit gescannten Noten: Die Stimmenbezeichnung im Kopf jeder Seite wird per OCR (tesseract.js, Deutsch + Englisch) gelesen, Textlayer werden bevorzugt genutzt. Erkannte Ergebnisse werden zwischengespeichert.
+<p align="center">
+  Einzelne Stimmen aus gescannten Noten-PDFs heraussuchen und als eigene PDF exportieren.<br>
+  Für Windows und macOS, ohne Installation weiterer Software.
+</p>
+
+---
+
+Notenwart-Alltag: Ein Ordner voller Stücke als PDF, jedes mit allen Stimmen hintereinander, und die Trompete 1 braucht ihre Mappe. **Stimmenauszug** liest die Überschrift jeder Seite, findet die passenden Blätter in allen Stücken und legt sie in einer neuen PDF ab, mit einem Lesezeichen pro Stück. Die Originale bleiben unverändert.
+
+## Was es kann
+
+- **Gescannte Noten.** Texterkennung (OCR) direkt in der App, Deutsch und Englisch, ohne Cloud. Textlayer werden genutzt, wenn vorhanden.
+- **Uneinheitliche Bezeichnungen.** „Trompete 1“, „1. Trompete“, „Trumpet 1“, „Tromba I“, „Trp. 1“, „1st Bb Trumpet“ landen alle beim selben Ergebnis. Eigene Aliase wie „1. Stimme (B)“ → „Trompete 1“ sind möglich.
+- **Partituren werden erkannt** und ausgelassen, auch Folgeseiten ohne Überschrift.
+- **Folgeseiten** einer Stimme werden bis zur nächsten Überschrift mitgenommen.
+- **Doppelbelegungen** wie „4. Stimme in C (Bariton, Posaune 2)“ gelten für alle genannten Stimmen.
+- **Kontrolle vor dem Export** mit Miniaturen, Großansicht, Konfidenz und manueller Korrektur.
+- **Mehrere Stimmen pro Lauf**, je eine PDF, Lesezeichen pro Stück.
+- **Cache.** Erkannte Ergebnisse werden gespeichert, ein zweiter Lauf über denselben Bestand ist sofort fertig.
+- **Optionale KI-Erkennung** für schlechte Scans über eine OpenAI-kompatible Schnittstelle (OpenRouter, OpenAI oder lokal mit Ollama). Standardmäßig aus.
+
+## So sieht es aus
+
+**Auswahl:** Ordner oder Dateien hineinziehen, Stimmen eintragen.
+
+![Auswahl](docs/screenshots/auswahl.png)
+
+**Kontrolle:** Treffer pro Stück, unsichere Zuordnungen sind markiert, jede Seite lässt sich ab- oder zuwählen und einer anderen Stimme zuordnen.
+
+![Kontrolle](docs/screenshots/kontrolle.png)
+
+**Großansicht:** Ein Klick auf eine Miniatur zeigt die Seite in voller Größe mit dem erkannten Text.
+
+![Großansicht](docs/screenshots/vorschau.png)
+
+## Installation
+
+Fertige Builds liegen unter [Releases](../../releases). Die App ist nicht signiert, deshalb warnen Windows und macOS beim ersten Start einmalig. Die Schritte dazu stehen in [docs/INSTALLATION.md](docs/INSTALLATION.md).
+
+| Plattform | Datei |
+|---|---|
+| macOS (Apple Silicon) | `Stimmenauszug-<Version>-arm64.dmg` |
+| Windows (64 Bit), Installer | `Stimmenauszug Setup <Version>.exe` |
+| Windows (64 Bit), portabel | `Stimmenauszug <Version>.exe` |
+
+## Wie die Erkennung arbeitet
+
+1. **Textlayer** der Seite lesen (oberer Bereich). Reicht das für eine Zuordnung, ist die Seite fertig.
+2. Sonst **OCR** des Kopfbereichs mit tesseract.js, in drei Auflösungen, weil 1-Bit-Scans in Originalauflösung schlecht lesbar sind. Ohne Treffer wird die Seite gedreht, für quer eingescannte Blätter.
+3. **Klassifikation** über eine Synonymtabelle mit Fehlertoleranz: Instrument, Nummer, Stimmung, Schlüssel. Mehrere verschiedene Stimmen auf einer Seite bedeuten Partitur. Titelwörter („Polka für Trompete“) zählen nicht als Stimme.
+4. **Zuordnung** der Seiten zu Abschnitten: Eine Überschrift gilt bis zur nächsten, Partiturseiten unterbrechen.
+5. Optional **KI**: Der Kopfbereich wird als Bild an ein Vision-Modell geschickt, nur für unsichere Seiten oder für alle.
+
+Auf einem Bestand von 189 PDFs mit 2969 Seiten (99 % Scans) dauert der Erstlauf rund 8 Minuten; 95 % der Seiten werden ohne KI zugeordnet.
 
 ## Entwicklung
 
@@ -12,37 +67,36 @@ node node_modules/electron/install.js   # falls npm die Install-Skripte blockier
 npm run dev
 ```
 
-Tests der Erkennungslogik:
+| Befehl | Zweck |
+|---|---|
+| `npm test` | Unit-Tests der Erkennungslogik (echte OCR-Strings als Fixtures) |
+| `NOTEN_DIR=/pfad npm run test:integration` | Analyse einer Stichprobe echter PDFs im gebauten Programm |
+| `npm run build` | Renderer, Preload und Hauptprozess bauen |
+| `npm run dist` | macOS- und Windows-Installer erzeugen, beide auf dem Mac |
 
-```bash
-npm test
-```
-
-Integrationstest über echte PDFs (Ordner per Umgebungsvariable):
-
-```bash
-NOTEN_DIR=/pfad/zu/noten npm run test:integration
-```
-
-Builds für macOS (arm64) und Windows (x64), beide auf dem Mac erzeugt:
-
-```bash
-npm run dist
-```
-
-Ergebnisse liegen in `dist/`. Siehe [docs/INSTALLATION.md](docs/INSTALLATION.md) für die Hinweise zu unsignierten Apps.
-
-## Testmodus ohne Oberfläche
+Testlauf ohne Oberfläche:
 
 ```bash
 SE_AUTORUN=/pfad/zu/noten SE_OUT=ergebnis.json SE_QUERY="Trompete 1" npx electron out/main/index.js
 ```
 
-Analysiert alle PDFs, schreibt die Zuordnung pro Seite als JSON und beendet sich. `SE_FORCE=1` ignoriert den Cache, `SE_LIMIT=10` begrenzt die Dateianzahl.
+`SE_FORCE=1` ignoriert den Cache, `SE_LIMIT=10` begrenzt die Dateianzahl, `SE_EXPORT=/ziel` exportiert die Treffer, `SE_SCREENSHOT=bild.png` fotografiert die Kontrollansicht.
 
-## Aufbau
+### Aufbau
 
-- `src/shared/`: Erkennungslogik ohne Electron-Abhängigkeit (Synonymtabelle, Matcher, Klassifikation, Seitenzuordnung).
-- `src/renderer/analysis/`: pdf.js-Rendering, tesseract-Worker, Pipeline pro Datei.
-- `src/main/`: Dateizugriff, Cache, Einstellungen, PDF-Export (pdf-lib), KI-Anbindung (OpenAI-kompatibel).
-- `src/renderer/steps/`: Oberfläche in vier Schritten (Auswahl, Analyse, Kontrolle, Export).
+```
+src/shared/     Erkennungslogik ohne Electron-Abhängigkeit
+                instruments.ts (Synonyme), matcher.ts, classify.ts, assign.ts, filename.ts
+src/renderer/   Oberfläche (React) und Analyse-Pipeline (pdf.js, tesseract.js)
+src/main/       Dateizugriff, Cache, Einstellungen, Export (pdf-lib), KI-Aufruf
+tests/          vitest
+docs/           Installationshinweise, Screenshots
+```
+
+## Technik
+
+Electron, React, TypeScript, [pdf.js](https://mozilla.github.io/pdf.js/), [tesseract.js](https://tesseract.projectnaptha.com/), [pdf-lib](https://pdf-lib.js.org/), gebaut mit electron-vite und electron-builder.
+
+## Lizenz
+
+MIT
