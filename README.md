@@ -9,6 +9,8 @@
   Für Windows und macOS, ohne Installation weiterer Software.
 </p>
 
+> **Entstehung:** Diese Software wurde mit KI-Unterstützung (Claude) entwickelt, nach dem Prinzip „KI schreibt, Mensch entscheidet und prüft“. Anforderungen, Architekturentscheidungen, Tests an echten Notenbeständen und jede Abnahme kamen von mir; der Code selbst stammt überwiegend aus dem Dialog mit der KI. Wer das Projekt weiterentwickelt, sollte das beim Lesen im Hinterkopf haben: Die Erkennungsregeln sind an einem konkreten Bestand kalibriert und mit 51 Tests abgesichert, aber nicht jede Zeile wurde von Hand geschrieben.
+
 ---
 
 Notenwart-Alltag: Ein Ordner voller Stücke als PDF, jedes mit allen Stimmen hintereinander, und die Trompete 1 braucht ihre Mappe. **Stimmenauszug** liest die Überschrift jeder Seite, findet die passenden Blätter in allen Stücken und legt sie in einer neuen PDF ab, mit einem Lesezeichen pro Stück. Die Originale bleiben unverändert.
