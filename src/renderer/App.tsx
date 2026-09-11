@@ -129,7 +129,7 @@ export default function App({ initial }: { initial?: AutorunUiState }) {
   return (
     <div className="app">
       <div className="topbar">
-        <span className="brand">Stimmenauszug</span>
+        <span className="brand">Notenwart</span>
         <div className="steps">
           {STEPS.map((s, i) => (
             <span

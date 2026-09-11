@@ -63,16 +63,16 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.version.outputs.version }}
-          name: Stimmenauszug ${{ steps.version.outputs.version }}
+          name: Notenwart ${{ steps.version.outputs.version }}
           generate_release_notes: true
           body: |
             Unsignierte Builds. Hinweise zum ersten Start: [docs/INSTALLATION.md](https://github.com/${{ github.repository }}/blob/main/docs/INSTALLATION.md)
 
             | Plattform | Datei |
             |---|---|
-            | macOS (Apple Silicon) | `Stimmenauszug-${{ steps.version.outputs.version }}-arm64.dmg` |
-            | Windows Installer | `Stimmenauszug-Setup-${{ steps.version.outputs.version }}.exe` |
-            | Windows portabel | `Stimmenauszug-Portable-${{ steps.version.outputs.version }}.exe` |
+            | macOS (Apple Silicon) | `Notenwart-${{ steps.version.outputs.version }}-arm64.dmg` |
+            | Windows Installer | `Notenwart-Setup-${{ steps.version.outputs.version }}.exe` |
+            | Windows portabel | `Notenwart-Portable-${{ steps.version.outputs.version }}.exe` |
           files: |
             dist/*.dmg
             dist/*.exe

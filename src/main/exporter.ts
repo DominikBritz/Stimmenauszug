@@ -70,7 +70,7 @@ export async function runExport(
     const job = jobs[jobIndex];
     const out = await PDFDocument.create();
     out.setTitle(job.fileName);
-    out.setProducer('Stimmenauszug');
+    out.setProducer('Notenwart');
     const outline: OutlineItem[] = [];
     let pageCount = 0;
     let pieceCount = 0;

@@ -1,5 +1,5 @@
-appId: de.britz.stimmenauszug
-productName: Stimmenauszug
+appId: de.britz.notenwart
+productName: Notenwart
 copyright: Copyright © 2026 Dominik Britz
 directories:
   buildResources: build

@@ -1,8 +1,8 @@
 {
-  "name": "stimmenauszug",
-  "productName": "Stimmenauszug",
-  "version": "0.1.0",
-  "description": "Extrahiert einzelne Stimmen aus Noten-PDFs",
+  "name": "notenwart",
+  "productName": "Notenwart",
+  "version": "0.2.0",
+  "description": "Stimmen aus Noten-PDFs heraussuchen oder aufteilen",
   "main": "./out/main/index.js",
   "author": "Dominik Britz",
   "license": "MIT",

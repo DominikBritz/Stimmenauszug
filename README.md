@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="build/icon.png" width="96" alt="Stimmenauszug">
+  <img src="build/icon.png" width="96" alt="Notenwart">
 </p>
 
-<h1 align="center">Stimmenauszug</h1>
+<h1 align="center">Notenwart</h1>
 
 <p align="center">
   Einzelne Stimmen aus gescannten Noten-PDFs heraussuchen und als eigene PDF exportieren.<br>
@@ -13,7 +13,7 @@
 
 ---
 
-Notenwart-Alltag: Ein Ordner voller Stücke als PDF, jedes mit allen Stimmen hintereinander, und die Trompete 1 braucht ihre Mappe. **Stimmenauszug** liest die Überschrift jeder Seite, findet die passenden Blätter in allen Stücken und legt sie in einer neuen PDF ab, mit einem Lesezeichen pro Stück. Die Originale bleiben unverändert.
+Alltag im Notenarchiv: Ein Ordner voller Stücke als PDF, jedes mit allen Stimmen hintereinander, und die Trompete 1 braucht ihre Mappe. **Notenwart** liest die Überschrift jeder Seite und kann zweierlei: eine Stimme aus allen Stücken heraussuchen und als eine PDF mit Lesezeichen pro Stück ablegen, oder jedes Stück in eine PDF pro Stimme aufteilen. Die Originale bleiben unverändert.
 
 ## Was es kann
 
@@ -45,7 +45,7 @@ Notenwart-Alltag: Ein Ordner voller Stücke als PDF, jedes mit allen Stimmen hin
 
 ## Hinweis zum Urheberrecht
 
-Stimmenauszug verändert oder vervielfältigt keine Noten über das hinaus, was du selbst tust: Es kopiert Seiten aus deinen eigenen PDFs in eine neue Datei. Ob du die Ergebnisse weitergeben darfst, richtet sich nach den Lizenzbedingungen der jeweiligen Verlagsausgabe. Für den Einsatz im Verein gilt üblicherweise: Kopien und Auszüge nur für Stücke, die der Verein rechtmäßig erworben hat, und nur für die eigenen Musikerinnen und Musiker. Im Zweifel beim Verlag oder beim Verband (in Deutschland z.B. über die BDMV-Rahmenverträge mit der GEMA und der VG Musikedition) nachfragen.
+Notenwart verändert oder vervielfältigt keine Noten über das hinaus, was du selbst tust: Es kopiert Seiten aus deinen eigenen PDFs in eine neue Datei. Ob du die Ergebnisse weitergeben darfst, richtet sich nach den Lizenzbedingungen der jeweiligen Verlagsausgabe. Für den Einsatz im Verein gilt üblicherweise: Kopien und Auszüge nur für Stücke, die der Verein rechtmäßig erworben hat, und nur für die eigenen Musikerinnen und Musiker. Im Zweifel beim Verlag oder beim Verband (in Deutschland z.B. über die BDMV-Rahmenverträge mit der GEMA und der VG Musikedition) nachfragen.
 
 ## Installation
 
@@ -53,9 +53,9 @@ Fertige Builds liegen unter [Releases](../../releases). Die App ist nicht signie
 
 | Plattform | Datei |
 |---|---|
-| macOS (Apple Silicon) | `Stimmenauszug-<Version>-arm64.dmg` |
-| Windows (64 Bit), Installer | `Stimmenauszug-Setup-<Version>.exe` |
-| Windows (64 Bit), portabel | `Stimmenauszug-Portable-<Version>.exe` |
+| macOS (Apple Silicon) | `Notenwart-<Version>-arm64.dmg` |
+| Windows (64 Bit), Installer | `Notenwart-Setup-<Version>.exe` |
+| Windows (64 Bit), portabel | `Notenwart-Portable-<Version>.exe` |
 
 ## Wie die Erkennung arbeitet
 

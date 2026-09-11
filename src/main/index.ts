@@ -14,7 +14,7 @@ function createWindow(): void {
     height: 860,
     minWidth: 900,
     minHeight: 600,
-    title: 'Stimmenauszug',
+    title: 'Notenwart',
     show: false,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
