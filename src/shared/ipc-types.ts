@@ -5,8 +5,10 @@ export interface FileInfo {
   name: string;
   size: number;
   mtimeMs: number;
-  /** Relativer Ordner zur gewählten Wurzel, für die Anzeige */
+  /** Ordner für die Anzeige: relativ zur gewählten Wurzel, bei Einzeldateien der Elternordner */
   folder: string;
+  /** Relativer Ordner zur gewählten Wurzel ('' in der Wurzel); fehlt bei einzeln gewählten Dateien */
+  subdir?: string;
 }
 
 export interface ExportPiece {
