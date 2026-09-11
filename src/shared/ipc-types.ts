@@ -21,16 +21,21 @@ export interface ExportPiece {
 export interface ExportJob {
   /** Dateiname ohne Endung */
   fileName: string;
+  /** Unterordner im Zielordner, Segmente mit "/" getrennt (Aufteilen-Modus) */
+  subdir?: string;
   pieces: ExportPiece[];
 }
 
 export interface ExportRequest {
   outputDir: string;
   jobs: ExportJob[];
+  /** Vorhandene Zieldateien ersetzen statt "(2)" anzuhängen */
+  overwrite?: boolean;
 }
 
 export interface ExportResult {
   fileName: string;
+  subdir?: string;
   outputPath: string;
   pieceCount: number;
   pageCount: number;
@@ -39,8 +44,15 @@ export interface ExportResult {
 export interface ExportProgress {
   jobIndex: number;
   pieceIndex: number;
+  /** Abgeschlossene Stücke über alle Aufträge */
+  done: number;
   totalPieces: number;
   message: string;
+}
+
+export interface ExportExistingResult {
+  count: number;
+  paths: string[];
 }
 
 export interface AiClassifyRequest {

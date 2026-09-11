@@ -93,7 +93,7 @@ export default function Export({ entries, queries, selections, order, outputDir,
 
       {running && progress && (
         <div className="panel">
-          <div className="progress"><div style={{ width: `${Math.round(((progress.jobIndex * 0 + progress.pieceIndex + 1) / Math.max(1, progress.totalPieces)) * 100)}%` }} /></div>
+          <div className="progress"><div style={{ width: `${Math.round((progress.done / Math.max(1, progress.totalPieces)) * 100)}%` }} /></div>
           <p className="muted">{progress.message}</p>
         </div>
       )}

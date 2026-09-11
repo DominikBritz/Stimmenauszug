@@ -1,10 +1,33 @@
-import { readFile, writeFile, access } from 'node:fs/promises';
-import { join } from 'node:path';
+import { readFile, writeFile, access, mkdir } from 'node:fs/promises';
+import { join, resolve } from 'node:path';
 import { PDFDocument, PDFName, PDFDict, PDFArray, PDFHexString, PDFNumber, PDFRef } from 'pdf-lib';
-import type { ExportJob, ExportProgress, ExportResult } from '@shared/ipc-types';
+import type { ExportExistingResult, ExportJob, ExportProgress, ExportResult } from '@shared/ipc-types';
+import { sanitizeFileName } from '@shared/names';
 
-function sanitizeFileName(name: string): string {
-  return name.replace(/[\\/:*?"<>|]+/g, '-').replace(/\s+/g, ' ').trim() || 'Stimme';
+/** Zielordner eines Auftrags (Unterordner-Segmente einzeln bereinigt). */
+function targetDir(outputDir: string, job: ExportJob): string {
+  const segs = (job.subdir ?? '').split(/[\\/]+/).filter(Boolean).map(sanitizeFileName);
+  return join(outputDir, ...segs);
+}
+
+/** Pfad, den ein Auftrag im Überschreiben-Modus bekommt. */
+function plannedPath(outputDir: string, job: ExportJob): string {
+  return join(targetDir(outputDir, job), `${sanitizeFileName(job.fileName)}.pdf`);
+}
+
+/** Zählt, welche geplanten Zieldateien schon existieren (für die Rückfrage vor dem Überschreiben). */
+export async function findExisting(outputDir: string, jobs: ExportJob[]): Promise<ExportExistingResult> {
+  const paths: string[] = [];
+  for (const job of jobs) {
+    const p = plannedPath(outputDir, job);
+    try {
+      await access(p);
+      paths.push(p);
+    } catch {
+      // existiert nicht
+    }
+  }
+  return { count: paths.length, paths };
 }
 
 async function uniquePath(dir: string, base: string): Promise<string> {
@@ -60,14 +83,33 @@ export async function runExport(
   outputDir: string,
   jobs: ExportJob[],
   onProgress: (p: ExportProgress) => void,
+  opts: { overwrite?: boolean } = {},
 ): Promise<ExportResult[]> {
   const results: ExportResult[] = [];
   const totalPieces = jobs.reduce((n, j) => n + j.pieces.length, 0);
   let done = 0;
   const sourceCache = new Map<string, PDFDocument>();
 
+  if (opts.overwrite) {
+    // Schutz: keine Quelldatei überschreiben, keine zwei Aufträge auf dieselbe Zieldatei
+    const sources = new Set(jobs.flatMap((j) => j.pieces.map((p) => resolve(p.path))));
+    const planned = new Set<string>();
+    for (const job of jobs) {
+      const p = resolve(plannedPath(outputDir, job));
+      if (sources.has(p)) throw new Error(`Zieldatei wäre eine Quelldatei: ${p}`);
+      if (planned.has(p)) throw new Error(`Zwei Aufträge mit derselben Zieldatei: ${p}`);
+      planned.add(p);
+    }
+  }
+
+  let lastSubdir: string | undefined;
   for (let jobIndex = 0; jobIndex < jobs.length; jobIndex++) {
     const job = jobs[jobIndex];
+    if (job.subdir !== lastSubdir) {
+      // Aufteilen-Aufträge kommen pro Stück gruppiert; geladene Quellen des vorigen Stücks freigeben
+      sourceCache.clear();
+      lastSubdir = job.subdir;
+    }
     const out = await PDFDocument.create();
     out.setTitle(job.fileName);
     out.setProducer('Notenwart');
@@ -77,7 +119,7 @@ export async function runExport(
 
     for (let pieceIndex = 0; pieceIndex < job.pieces.length; pieceIndex++) {
       const piece = job.pieces[pieceIndex];
-      onProgress({ jobIndex, pieceIndex, totalPieces, message: `${job.fileName}: ${piece.title}` });
+      onProgress({ jobIndex, pieceIndex, done, totalPieces, message: `${job.fileName}: ${piece.title}` });
       if (!piece.pages.length) { done++; continue; }
       let src = sourceCache.get(piece.path);
       if (!src) {
@@ -96,12 +138,14 @@ export async function runExport(
     }
 
     addOutline(out, outline);
-    const outputPath = await uniquePath(outputDir, sanitizeFileName(job.fileName));
+    const dir = targetDir(outputDir, job);
+    await mkdir(dir, { recursive: true });
+    const outputPath = opts.overwrite ? plannedPath(outputDir, job) : await uniquePath(dir, sanitizeFileName(job.fileName));
     const bytes = await out.save({ useObjectStreams: true });
     await writeFile(outputPath, bytes);
-    results.push({ fileName: job.fileName, outputPath, pieceCount, pageCount });
+    results.push({ fileName: job.fileName, subdir: job.subdir, outputPath, pieceCount, pageCount });
   }
-  void done;
+  onProgress({ jobIndex: jobs.length, pieceIndex: 0, done, totalPieces, message: 'Fertig' });
   return results;
 }
 
