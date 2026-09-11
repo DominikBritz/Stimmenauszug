@@ -195,6 +195,32 @@ describe('assignPages', () => {
   });
 });
 
+describe('Rundel "Quintett +": Stimme mit Instrumentenliste ist keine Partitur', () => {
+  it('"3. Stimme in Bb … Tenorhorn, Tenorsaxophon 1, Posaune 1" ist Stimme 3 in B mit Zweitbezeichnungen', () => {
+    const c = classifyText('Donle& KLEINE BLASMUSIK Quintett + 3. Stimme in Bb Böhmischer Traum Norbert Gälle Tenorhorn, Tenorsaxophon 1, Bearb.: Siegfried Rundel Polka Posaune 1 5| 1.x Soli,2. xtacetbis *, 3. x Tutti');
+    expect(c.kind).toBe('stimme');
+    expect(c.part).toMatchObject({ instrument: 'stimme', numbers: [3], key: 'B' });
+    expect(c.alsoParts?.map((p) => p.instrument)).toEqual(expect.arrayContaining(['tenorhorn', 'tenorsax', 'posaune']));
+  });
+  it('"1. Stimme in C Flügelhorn 1, Trompete 1, Oboe" ist Stimme 1 in C, Zweitstimmen erben die Stimmung', () => {
+    const c = classifyText('Daud& KLEINE BLASMUSIK Quintett + Norbert Gälle Böhmischer Traum 1. Stimme in C Flügelhorn 1, Trompete 1, Bearb.: Siegfried Rundel Polka Oboe 5 1.xtacetbis *');
+    expect(c.kind).toBe('stimme');
+    expect(c.part).toMatchObject({ instrument: 'stimme', numbers: [1], key: 'C' });
+    const trp = c.alsoParts?.find((p) => p.instrument === 'trompete');
+    expect(trp).toMatchObject({ numbers: [1], key: 'C' });
+  });
+  it('"Begleitung 1, 2 in C … Bariton, Posaune" ist Akkordeon 1/2 in C', () => {
+    const c = classifyText('Dlslk KLEINE BLASMUSIK Quintett + Begleitung 1, 2 in C Böhmischer Traum Norbert Gälle (ad libitum) Bearb.: Siegfried Rundel Polka Bariton, Posaune mf 13 10 21 20');
+    expect(c.kind).toBe('stimme');
+    expect(c.part).toMatchObject({ instrument: 'akkordeon', numbers: [1, 2], key: 'C' });
+    expect(c.alsoParts?.map((p) => p.instrument)).toEqual(expect.arrayContaining(['bariton', 'posaune']));
+  });
+  it('Partiturseite mit Solo-Trompete vor "1. Stimme" und weiteren Instrumenten bleibt Partitur', () => {
+    const c = classifyText('Solo-Trompete in B (ad libitum) 1. Stimme in B (Flügelhorn 1) Tenorhorn Bariton Schlagzeug');
+    expect(c.kind).toBe('partitur');
+  });
+});
+
 describe('Regeln aus dem Testlauf', () => {
   it('Partitur-Folgeseite mit Solo-Tromp. und 1./2./3. Stimme', () => {
     const c = classifyText('3 1 33 l2. 34 39 38 Fine 36 40 35 Sola Solo-Tromp. (B) nur 1. x ---J f 1. Stimme (B) 2. Stimme (B») 3. Stimme (B)');

@@ -20,7 +20,7 @@ async function collect(root: string, dir: string, out: FileInfo[]): Promise<void
     if (s.isDirectory()) {
       if (!IGNORED_DIRS.has(e.name)) dirs.push(full);
     } else if (s.isFile() && /\.pdf$/i.test(e.name)) {
-      out.push({ path: full, name: e.name, size: s.size, mtimeMs: s.mtimeMs, folder: relative(root, dir) });
+      out.push({ path: full, name: e.name, size: s.size, mtimeMs: s.mtimeMs, folder: relative(root, dir), subdir: relative(root, dir) });
     }
   }
   for (const d of dirs) await collect(root, d, out);

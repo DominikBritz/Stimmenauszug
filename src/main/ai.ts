@@ -27,8 +27,8 @@ export async function aiClassify(req: AiClassifyRequest, settings: Settings): Pr
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   if (apiKey) headers.Authorization = `Bearer ${apiKey}`;
   if (baseUrl.includes('openrouter.ai')) {
-    headers['HTTP-Referer'] = 'https://github.com/dominik/stimmenauszug';
-    headers['X-Title'] = 'Stimmenauszug';
+    headers['HTTP-Referer'] = 'https://github.com/DominikBritz/Notenwart';
+    headers['X-Title'] = 'Notenwart';
   }
   const userText = req.ocrText
     ? `Lokale OCR hat gelesen (kann fehlerhaft sein): "${req.ocrText.slice(0, 300)}"`

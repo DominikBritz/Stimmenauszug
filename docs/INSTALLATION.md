@@ -4,12 +4,12 @@ Die App ist nicht signiert (kein Apple-Developer-Account, kein Windows-Zertifika
 
 ## macOS (Apple Silicon)
 
-1. `Stimmenauszug-<Version>-arm64.dmg` öffnen und die App in den Ordner *Programme* ziehen.
-2. Beim ersten Start meldet macOS „Stimmenauszug ist beschädigt und kann nicht geöffnet werden“ oder „kann nicht überprüft werden“. Das liegt nur an der fehlenden Signatur.
+1. `Notenwart-<Version>-arm64.dmg` öffnen und die App in den Ordner *Programme* ziehen.
+2. Beim ersten Start meldet macOS „Notenwart ist beschädigt und kann nicht geöffnet werden“ oder „kann nicht überprüft werden“. Das liegt nur an der fehlenden Signatur.
 3. Terminal öffnen und einmalig ausführen:
 
 ```bash
-xattr -cr "/Applications/Stimmenauszug.app"
+xattr -cr "/Applications/Notenwart.app"
 ```
 
 4. Danach startet die App normal per Doppelklick.
@@ -20,8 +20,8 @@ Alternative ohne Terminal: In *Systemeinstellungen > Datenschutz & Sicherheit* n
 
 Zwei Varianten liegen bei:
 
-- `Stimmenauszug-Setup-<Version>.exe`: Installer, legt Startmenü-Eintrag an.
-- `Stimmenauszug-Portable-<Version>.exe`: portable Version, läuft direkt ohne Installation (z.B. vom USB-Stick).
+- `Notenwart-Setup-<Version>.exe`: Installer, legt Startmenü-Eintrag an.
+- `Notenwart-Portable-<Version>.exe`: portable Version, läuft direkt ohne Installation (z.B. vom USB-Stick).
 
 Beim ersten Start zeigt Windows SmartScreen „Der Computer wurde durch Windows geschützt“. Auf **Weitere Informationen** klicken, dann **Trotzdem ausführen**.
 
@@ -31,5 +31,5 @@ Keine. Texterkennung, PDF-Verarbeitung und Sprachdaten sind in der App enthalten
 
 ## Speicherorte
 
-- Einstellungen und Erkennungs-Cache: macOS `~/Library/Application Support/Stimmenauszug/`, Windows `%APPDATA%\Stimmenauszug\`.
+- Einstellungen und Erkennungs-Cache: macOS `~/Library/Application Support/Notenwart/`, Windows `%APPDATA%\Notenwart\`.
 - Der Cache kann jederzeit in den Einstellungen geleert werden; er wird beim nächsten Lauf neu aufgebaut.

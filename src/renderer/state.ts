@@ -1,7 +1,8 @@
 import type { FileInfo } from '@shared/ipc-types';
 import type { FileAnalysis, PartRef } from '@shared/types';
 
-export type Step = 'auswahl' | 'analyse' | 'kontrolle' | 'export';
+export type Mode = 'suchen' | 'aufteilen';
+export type Step = 'start' | 'auswahl' | 'analyse' | 'kontrolle' | 'export';
 
 export interface Query {
   raw: string;

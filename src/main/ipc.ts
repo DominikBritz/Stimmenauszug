@@ -3,7 +3,7 @@ import { writeFile } from 'node:fs/promises';
 import { readPdf, scanPaths } from './files';
 import { cacheStats, clearCache, getCached, setCached } from './cache';
 import { getSettings, setSettings } from './settings';
-import { runExport } from './exporter';
+import { findExisting, runExport } from './exporter';
 import { aiClassify, fetchOpenRouterPricing } from './ai';
 import type { AiClassifyRequest, ExportRequest, FileInfo } from '@shared/ipc-types';
 import type { Settings } from '@shared/settings';
@@ -66,10 +66,16 @@ export function registerIpc(): void {
 
   ipcMain.handle('export:run', async (e, req: ExportRequest) => {
     const sender = e.sender;
-    return runExport(req.outputDir, req.jobs, (p) => {
-      if (!sender.isDestroyed()) sender.send('export:progress', p);
-    });
+    return runExport(
+      req.outputDir,
+      req.jobs,
+      (p) => {
+        if (!sender.isDestroyed()) sender.send('export:progress', p);
+      },
+      { overwrite: !!req.overwrite },
+    );
   });
+  ipcMain.handle('export:existing', (_e, req: ExportRequest) => findExisting(req.outputDir, req.jobs));
 
   ipcMain.handle('ai:classify', async (_e, req: AiClassifyRequest) => aiClassify(req, await getSettings()));
   ipcMain.handle('ai:pricing', (_e, models: string[]) => fetchOpenRouterPricing(models));
@@ -78,10 +84,12 @@ export function registerIpc(): void {
   ipcMain.handle('shell:showInFolder', (_e, p: string) => shell.showItemInFolder(p));
   ipcMain.handle('system:cpus', () => require('node:os').cpus().length);
 
-  // Autorun für Tests: SE_AUTORUN=<Ordner oder Datei[;Datei…]> SE_OUT=<json> [SE_QUERY="Trompete 1"] [SE_FORCE=1] [SE_LIMIT=n]
+  // Autorun für Tests: SE_AUTORUN=<Ordner oder Datei[;Datei…]> SE_OUT=<json> [SE_QUERY="Trompete 1"] [SE_MODE=aufteilen] [SE_FORCE=1] [SE_LIMIT=n] [SE_EXPORT=<Ordner>]
   ipcMain.handle('autorun:config', () => {
     if (!process.env.SE_AUTORUN) {
-      return process.env.SE_SCREENSHOT ? { paths: [], out: null, query: null, force: false, limit: 0, screenshot: process.env.SE_SCREENSHOT } : null;
+      return process.env.SE_SCREENSHOT
+        ? { paths: [], out: null, query: null, force: false, limit: 0, screenshot: process.env.SE_SCREENSHOT, exportDir: null, mode: 'suchen' }
+        : null;
     }
     return {
       paths: process.env.SE_AUTORUN.split(';').filter(Boolean),
@@ -91,6 +99,7 @@ export function registerIpc(): void {
       limit: process.env.SE_LIMIT ? Number(process.env.SE_LIMIT) : 0,
       screenshot: process.env.SE_SCREENSHOT ?? null,
       exportDir: process.env.SE_EXPORT ?? null,
+      mode: process.env.SE_MODE === 'aufteilen' ? 'aufteilen' : 'suchen',
     };
   });
   ipcMain.handle('autorun:screenshot', async (e, path: string) => {

@@ -54,6 +54,4 @@ export function selectForQuery(files: AnalyzedFile[], query: PartRef, opts: Sele
   return out;
 }
 
-export function pieceTitle(info: FileInfo): string {
-  return info.name.replace(/\.pdf$/i, '');
-}
+export { pieceTitle } from '@shared/names';

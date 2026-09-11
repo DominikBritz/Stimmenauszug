@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="build/icon.png" width="96" alt="Stimmenauszug">
+  <img src="build/icon.png" width="96" alt="Notenwart">
 </p>
 
-<h1 align="center">Stimmenauszug</h1>
+<h1 align="center">Notenwart</h1>
 
 <p align="center">
   Einzelne Stimmen aus gescannten Noten-PDFs heraussuchen und als eigene PDF exportieren.<br>
@@ -13,9 +13,16 @@
 
 ---
 
-Notenwart-Alltag: Ein Ordner voller Stücke als PDF, jedes mit allen Stimmen hintereinander, und die Trompete 1 braucht ihre Mappe. **Stimmenauszug** liest die Überschrift jeder Seite, findet die passenden Blätter in allen Stücken und legt sie in einer neuen PDF ab, mit einem Lesezeichen pro Stück. Die Originale bleiben unverändert.
+Alltag im Notenarchiv: Ein Ordner voller Stücke als PDF, jedes mit allen Stimmen hintereinander, und die Trompete 1 braucht ihre Mappe. **Notenwart** liest die Überschrift jeder Seite und kann zweierlei: eine Stimme aus allen Stücken heraussuchen und als eine PDF mit Lesezeichen pro Stück ablegen, oder jedes Stück in eine PDF pro Stimme aufteilen. Die Originale bleiben unverändert.
 
 ## Was es kann
+
+Zwei Werkzeuge, wählbar auf der Startseite:
+
+- **Stimmen heraussuchen:** Eine oder mehrere Stimmen aus allen Stücken finden, je Stimme eine PDF mit Lesezeichen pro Stück. Für die Notenmappe.
+- **Stimmen aufteilen:** Jedes Stück in eine PDF pro Stimme zerlegen, benannt nach der Stimme („Trompete 1 in B.pdf“), pro Stück ein Unterordner. Partiturseiten kommen in „Partitur.pdf“, Seiten ohne erkannte Stimme in „Sonstiges.pdf“. Unterordner des Eingabeordners werden gespiegelt, Dateien, die schon eine Einzelstimme sind, werden übersprungen. Für das Notenarchiv.
+
+Beiden gemeinsam:
 
 - **Gescannte Noten.** Texterkennung (OCR) direkt in der App, Deutsch und Englisch, ohne Cloud. Textlayer werden genutzt, wenn vorhanden.
 - **Uneinheitliche Bezeichnungen.** „Trompete 1“, „1. Trompete“, „Trumpet 1“, „Tromba I“, „Trp. 1“, „1st Bb Trumpet“ landen alle beim selben Ergebnis. Eigene Aliase wie „1. Stimme (B)“ → „Trompete 1“ sind möglich.
@@ -29,6 +36,10 @@ Notenwart-Alltag: Ein Ordner voller Stücke als PDF, jedes mit allen Stimmen hin
 
 ## So sieht es aus
 
+**Start:** Werkzeug wählen.
+
+![Start](docs/screenshots/start.png)
+
 **Auswahl:** Ordner oder Dateien hineinziehen, Stimmen eintragen.
 
 ![Auswahl](docs/screenshots/auswahl.png)
@@ -41,11 +52,15 @@ Notenwart-Alltag: Ein Ordner voller Stücke als PDF, jedes mit allen Stimmen hin
 
 ![Großansicht](docs/screenshots/vorschau.png)
 
+**Aufteilen:** Pro Stück die erkannten Abschnitte, jede Zeile wird eine Datei. Hinweise bei unsicheren Seiten, mehrfach vorkommenden Stimmen und Zweitstimmen.
+
+![Aufteilen](docs/screenshots/aufteilen.png)
+
 *Die Notenzeilen in den Screenshots sind unkenntlich gemacht. Die gezeigten Noten sind urheberrechtlich geschützte Verlagsausgaben; nur Titel und Stimmenbezeichnung sind sichtbar, um die Funktion zu zeigen.*
 
 ## Hinweis zum Urheberrecht
 
-Stimmenauszug verändert oder vervielfältigt keine Noten über das hinaus, was du selbst tust: Es kopiert Seiten aus deinen eigenen PDFs in eine neue Datei. Ob du die Ergebnisse weitergeben darfst, richtet sich nach den Lizenzbedingungen der jeweiligen Verlagsausgabe. Für den Einsatz im Verein gilt üblicherweise: Kopien und Auszüge nur für Stücke, die der Verein rechtmäßig erworben hat, und nur für die eigenen Musikerinnen und Musiker. Im Zweifel beim Verlag oder beim Verband (in Deutschland z.B. über die BDMV-Rahmenverträge mit der GEMA und der VG Musikedition) nachfragen.
+Notenwart verändert oder vervielfältigt keine Noten über das hinaus, was du selbst tust: Es kopiert Seiten aus deinen eigenen PDFs in eine neue Datei. Ob du die Ergebnisse weitergeben darfst, richtet sich nach den Lizenzbedingungen der jeweiligen Verlagsausgabe. Für den Einsatz im Verein gilt üblicherweise: Kopien und Auszüge nur für Stücke, die der Verein rechtmäßig erworben hat, und nur für die eigenen Musikerinnen und Musiker. Im Zweifel beim Verlag oder beim Verband (in Deutschland z.B. über die BDMV-Rahmenverträge mit der GEMA und der VG Musikedition) nachfragen.
 
 ## Installation
 
@@ -53,9 +68,9 @@ Fertige Builds liegen unter [Releases](../../releases). Die App ist nicht signie
 
 | Plattform | Datei |
 |---|---|
-| macOS (Apple Silicon) | `Stimmenauszug-<Version>-arm64.dmg` |
-| Windows (64 Bit), Installer | `Stimmenauszug-Setup-<Version>.exe` |
-| Windows (64 Bit), portabel | `Stimmenauszug-Portable-<Version>.exe` |
+| macOS (Apple Silicon) | `Notenwart-<Version>-arm64.dmg` |
+| Windows (64 Bit), Installer | `Notenwart-Setup-<Version>.exe` |
+| Windows (64 Bit), portabel | `Notenwart-Portable-<Version>.exe` |
 
 ## Wie die Erkennung arbeitet
 
@@ -94,7 +109,7 @@ Testlauf ohne Oberfläche:
 SE_AUTORUN=/pfad/zu/noten SE_OUT=ergebnis.json SE_QUERY="Trompete 1" npx electron out/main/index.js
 ```
 
-`SE_FORCE=1` ignoriert den Cache, `SE_LIMIT=10` begrenzt die Dateianzahl, `SE_EXPORT=/ziel` exportiert die Treffer, `SE_SCREENSHOT=bild.png` fotografiert die Kontrollansicht.
+`SE_FORCE=1` ignoriert den Cache, `SE_LIMIT=10` begrenzt die Dateianzahl, `SE_EXPORT=/ziel` exportiert die Treffer, `SE_SCREENSHOT=bild.png` fotografiert die Kontrollansicht. `SE_MODE=aufteilen` läuft im Aufteilen-Modus: Der Bericht enthält dann die Buckets je Stück, und `SE_EXPORT` legt die Ordnerstruktur an.
 
 ### Aufbau
 
