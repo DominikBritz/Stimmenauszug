@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { formatPart, partKey } from '@shared/instruments';
+import { formatPart } from '@shared/instruments';
 import type { PartRef } from '@shared/types';
 import { renderLarge } from '../analysis/preview';
 import type { AnalyzedEntry } from '../state';
+import PartSelect, { selectValueOf } from './PartSelect';
 
 interface Props {
   entry: AnalyzedEntry;
@@ -46,7 +47,6 @@ export default function Vorschau({ entry, page, selected, knownParts, onToggle, 
   }, [page, total, selected, onClose, onNavigate, onToggle]);
 
   const label = a.kind === 'partitur' ? 'Partitur' : a.part ? formatPart(a.part) : a.kind === 'unsicher' ? 'unsicher' : 'keine Stimme';
-  const selectValue = a.part && a.kind !== 'partitur' ? partKey(a.part) : a.kind === 'partitur' ? '__partitur' : '__none';
 
   return (
     <div className="modal-bg" onClick={onClose}>
@@ -74,11 +74,7 @@ export default function Vorschau({ entry, page, selected, knownParts, onToggle, 
           </label>
           <div style={{ marginTop: 10 }}>
             <div className="hint">Stimme dieser Seite korrigieren</div>
-            <select value={selectValue} onChange={(e) => onAssign(page, e.target.value)} style={{ width: '100%' }}>
-              <option value="__none">– keine Stimme –</option>
-              <option value="__partitur">Partitur</option>
-              {knownParts.map((p) => <option key={partKey(p)} value={partKey(p)}>{formatPart(p)}</option>)}
-            </select>
+            <PartSelect value={selectValueOf(a)} knownParts={knownParts} onChange={(v) => onAssign(page, v)} style={{ width: '100%' }} />
           </div>
           <div style={{ marginTop: 12 }}>
             <div className="hint">Erkannter Text im Kopfbereich</div>

@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react';
-import { assignPages } from '@shared/assign';
 import { formatPart, partKey } from '@shared/instruments';
-import { parseQuery, samePart } from '@shared/matcher';
-import type { PartRef, PageAssignment } from '@shared/types';
+import { samePart } from '@shared/matcher';
+import type { PartRef } from '@shared/types';
+import { applyManualAssignment } from '../analysis/manual';
 import { pieceTitle, selectForQuery } from '../analysis/select';
+import PageThumb from './PageThumb';
 import Vorschau from './Vorschau';
 import type { AnalyzedEntry, Query, Selection } from '../state';
 
@@ -20,15 +21,6 @@ interface Props {
   onReanalyzeAll: () => void;
   /** Testmodus: Großansicht des ersten Treffers sofort öffnen */
   autoPreview?: boolean;
-}
-
-const KIND_LABEL = { stimme: 'Stimme', partitur: 'Partitur', sonstiges: 'kein Kopf', unsicher: 'unsicher' } as const;
-const SOURCE_LABEL = { text: 'Text', ocr: 'OCR', ki: 'KI', dateiname: 'Dateiname', manuell: 'manuell', fortsetzung: 'Folgeseite' } as const;
-
-function assignmentLabel(a: PageAssignment): string {
-  if (a.kind === 'partitur') return 'Partitur';
-  if (a.part) return formatPart(a.part);
-  return KIND_LABEL[a.kind];
 }
 
 export default function Kontrolle({ entries, queries, selections, setSelections, includeUnnumbered, updateEntry, onBack, onNext, onReanalyze, onReanalyzeAll, autoPreview }: Props) {
@@ -76,22 +68,9 @@ export default function Kontrolle({ entries, queries, selections, setSelections,
 
   /** Manuelle Zuweisung einer Seite: ändert die Analyse, berechnet Folgeseiten neu, speichert im Cache. */
   async function assignManually(entry: AnalyzedEntry, page: number, value: string) {
-    const pages = entry.analysis.pages.map((p) => ({ ...p }));
-    const target = pages[page - 1];
-    if (value === '__partitur') {
-      target.kind = 'partitur'; target.part = undefined;
-    } else if (value === '__none') {
-      target.kind = 'sonstiges'; target.part = undefined;
-    } else {
-      const part = knownParts.find((p) => partKey(p) === value) ?? parseQuery(value);
-      if (!part) return;
-      target.kind = 'stimme'; target.part = part;
-    }
-    target.source = 'manuell';
-    target.confidence = 1;
-    const analysis = { ...entry.analysis, pages, assignments: assignPages(pages, entry.analysis.filenamePart) };
-    const updated = { ...entry, analysis };
-    await window.api.invoke('cache:set', entry.info, analysis);
+    const updated = applyManualAssignment(entry, page, value, knownParts);
+    if (!updated) return;
+    await window.api.invoke('cache:set', entry.info, updated.analysis);
     updateEntry(updated);
     // Auswahl für diese Datei in allen Tabs neu aus der Analyse ableiten
     const next = selections.map((s, qi) => {
@@ -118,28 +97,20 @@ export default function Kontrolle({ entries, queries, selections, setSelections,
       <div className="thumbs">
         {pagesToShow.map((pg) => {
           const asg = a.assignments[pg - 1];
-          const pa = a.pages[pg - 1];
           const on = sel.get(entry.info.path)?.has(pg) ?? false;
           const matches = !!asg.part && samePart(asg.part, query.part!);
           return (
-            <div
+            <PageThumb
               key={pg}
-              className={'thumb' + (on ? ' selected' : '') + (!on && !matches ? ' dim' : '')}
-              title={`Seite ${pg}\n${assignmentLabel(asg)} (${SOURCE_LABEL[asg.source]}, ${Math.round(asg.confidence * 100)} %)\n${pa.text.slice(0, 200)}`}
-            >
-              <input className="check" type="checkbox" checked={on} onChange={(e) => setPage(entry.info.path, pg, e.target.checked)} />
-              <img src={a.thumbnails[pg - 1]} alt="" title="Klicken für Großansicht" onClick={() => setPreview({ path: entry.info.path, page: pg })} />
-              <div className="cap">
-                <b>S. {pg}</b>
-                <span className={'badge ' + (asg.kind === 'stimme' ? (asg.source === 'fortsetzung' ? 'neutral' : 'ok') : asg.kind === 'unsicher' ? 'warn' : 'neutral')}>{SOURCE_LABEL[asg.source]}</span>
-              </div>
-              <span className="lbl">{assignmentLabel(asg)}</span>
-              <select value={asg.part && asg.kind !== 'partitur' ? partKey(asg.part) : asg.kind === 'partitur' ? '__partitur' : '__none'} onChange={(e) => assignManually(entry, pg, e.target.value)}>
-                <option value="__none">– keine Stimme –</option>
-                <option value="__partitur">Partitur</option>
-                {knownParts.map((p) => <option key={partKey(p)} value={partKey(p)}>{formatPart(p)}</option>)}
-              </select>
-            </div>
+              entry={entry}
+              page={pg}
+              selected={on}
+              dim={!on && !matches}
+              knownParts={knownParts}
+              onToggle={(p, v) => setPage(entry.info.path, p, v)}
+              onPreview={(p) => setPreview({ path: entry.info.path, page: p })}
+              onAssign={(p, v) => assignManually(entry, p, v)}
+            />
           );
         })}
       </div>
