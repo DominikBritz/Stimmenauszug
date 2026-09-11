@@ -4,6 +4,9 @@ import type { FileInfo } from '@shared/ipc-types';
 import type { Settings } from '@shared/settings';
 import { analyzeFile } from './analysis/pipeline';
 import { selectForQuery, type AnalyzedFile } from './analysis/select';
+import { splitFile } from '@shared/split';
+import { buildSplitJobs } from './steps/ExportAufteilen';
+import type { Mode } from './state';
 
 interface AutorunConfig {
   paths: string[];
@@ -13,9 +16,11 @@ interface AutorunConfig {
   limit: number;
   screenshot: string | null;
   exportDir: string | null;
+  mode: Mode;
 }
 
 export interface AutorunUiState {
+  mode: Mode;
   files: FileInfo[];
   queries: string[];
   entries: AnalyzedFile[];
@@ -77,7 +82,27 @@ export async function maybeAutorun(): Promise<boolean | AutorunUiState> {
   }
   const total = ((performance.now() - t0) / 1000).toFixed(1);
   let selection: unknown = null;
-  if (cfg.query) {
+  let split: unknown = null;
+  let exported: unknown = null;
+  if (cfg.mode === 'aufteilen') {
+    const { jobs, skipped, subdirs } = buildSplitJobs(results, new Map());
+    split = results.map((r) => {
+      const s = splitFile(r.analysis);
+      log(`Aufteilen ${r.info.name}: ${s.skipped ? `übersprungen (${s.skipped})` : s.buckets.map((b) => `${b.label} [${b.pages.join(',')}]${b.warnings.length ? ' !' + b.warnings.join(',') : ''}`).join(' | ')}`);
+      return {
+        file: r.info.name,
+        subdir: subdirs.get(r.info.path) ?? null,
+        skipped: s.skipped ?? null,
+        buckets: s.buckets.map((b) => ({ label: b.label, kind: b.kind, pages: b.pages, sections: b.sections.map((x) => x.pages), warnings: b.warnings })),
+      };
+    });
+    log(`Aufteilen: ${jobs.length} Dateien in ${subdirs.size} Ordnern, ${skipped.length} Stücke übersprungen`);
+    if (cfg.exportDir) {
+      const res = (await window.api.invoke('export:run', { outputDir: cfg.exportDir, jobs, overwrite: true })) as { outputPath: string; pageCount: number }[];
+      for (const r of res) log(`Export: ${r.outputPath} (${r.pageCount} Seiten)`);
+      exported = res.map((r) => ({ outputPath: r.outputPath, pageCount: r.pageCount }));
+    }
+  } else if (cfg.query) {
     const q = parseQuery(cfg.query);
     if (q) {
       const hits = selectForQuery(results, q, { includeUnnumbered: settings.includeUnnumbered });
@@ -93,8 +118,8 @@ export async function maybeAutorun(): Promise<boolean | AutorunUiState> {
   }
   log(`Gesamt ${total}s`);
   if (cfg.screenshot) {
-    return { files, queries: cfg.query ? cfg.query.split(';') : ['Trompete 1'], entries: results, screenshot: cfg.screenshot };
+    return { mode: cfg.mode, files, queries: cfg.query ? cfg.query.split(';') : ['Trompete 1'], entries: results, screenshot: cfg.screenshot };
   }
-  await window.api.invoke('autorun:done', cfg.out, { totalSeconds: Number(total), files: report, selection });
+  await window.api.invoke('autorun:done', cfg.out, { totalSeconds: Number(total), files: report, selection, split, export: exported });
   return true;
 }

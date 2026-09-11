@@ -3,6 +3,7 @@ import { formatPart } from '@shared/instruments';
 import type { ExportJob, ExportProgress, ExportResult } from '@shared/ipc-types';
 import { pieceTitle } from '../analysis/select';
 import type { AnalyzedEntry, Query, Selection } from '../state';
+import { OpenButtons, OutputFolderField, ProgressPanel } from './ExportBits';
 
 interface Props {
   entries: Map<string, AnalyzedEntry>;
@@ -34,11 +35,6 @@ export default function Export({ entries, queries, selections, order, outputDir,
       .filter((p) => p.pages.length > 0),
   }));
 
-  async function pickOutput() {
-    const d = (await window.api.invoke('dialog:outputFolder')) as string | null;
-    if (d) setOutputDir(d);
-  }
-
   async function run() {
     if (!outputDir) return;
     setRunning(true);
@@ -63,13 +59,7 @@ export default function Export({ entries, queries, selections, order, outputDir,
     <>
       <div className="panel">
         <h2>Export</h2>
-        <div className="field">
-          <span>Zielordner</span>
-          <div className="row">
-            <span className="muted">{outputDir ?? 'noch nicht gewählt'}</span>
-            <button className="btn small" onClick={pickOutput}>Wählen…</button>
-          </div>
-        </div>
+        <OutputFolderField outputDir={outputDir} setOutputDir={setOutputDir} />
         {validQueries.map((q, qi) => (
           <div className="field" key={q.raw}>
             <span>{formatPart(q.part!)}</span>
@@ -91,12 +81,7 @@ export default function Export({ entries, queries, selections, order, outputDir,
         </div>
       )}
 
-      {running && progress && (
-        <div className="panel">
-          <div className="progress"><div style={{ width: `${Math.round((progress.done / Math.max(1, progress.totalPieces)) * 100)}%` }} /></div>
-          <p className="muted">{progress.message}</p>
-        </div>
-      )}
+      {running && progress && <ProgressPanel progress={progress} />}
       {error && <div className="panel" style={{ borderColor: 'var(--bad)' }}>Fehler beim Export: {error}</div>}
 
       {results && (
@@ -106,8 +91,7 @@ export default function Export({ entries, queries, selections, order, outputDir,
             <div className="row" key={r.outputPath} style={{ marginBottom: 6 }}>
               <b>{r.fileName}.pdf</b>
               <span className="muted">{r.pieceCount} Stücke, {r.pageCount} Seiten</span>
-              <button className="btn small" onClick={() => window.api.invoke('shell:openPath', r.outputPath)}>Öffnen</button>
-              <button className="btn small" onClick={() => window.api.invoke('shell:showInFolder', r.outputPath)}>Im Ordner zeigen</button>
+              <OpenButtons path={r.outputPath} />
             </div>
           ))}
           {results.length === 0 && <p className="muted">Nichts exportiert.</p>}

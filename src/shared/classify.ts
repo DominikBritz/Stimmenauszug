@@ -61,7 +61,15 @@ export function classifyText(text: string, opts: MatchOptions = {}): Classificat
   const families = new Set([...distinct.values()].map((c) => c.instrument));
   // "1. Stimme, 2. Stimme, 3. Stimme" auf einer Seite zählt nur als Liste, wenn mehrere Nummern vorkommen
   const listed = distinct.size + (generics.size >= 2 ? generics.size : 0);
-  if (listed >= SCORE_PARTS || families.size >= SCORE_PARTS) {
+  // Rundel "Quintett +": "3. Stimme in B" oder "Begleitung 1, 2 in C", gefolgt von den Instrumenten,
+  // die diese Stimme spielen können ("Tenorhorn, Tenorsaxophon 1, Posaune 1"), ist eine Stimme
+  // mit Zweitbezeichnungen, keine Partitur. Bedingung: genau eine solche Kopfstimme, alle anderen dahinter.
+  const lead = real.find((c) => c.confidence >= 0.85 && c.numbers.length > 0 && (c.instrument === 'stimme' || /^begleitung/.test(c.matchedText)));
+  const alternativeList =
+    !!lead &&
+    generics.size <= (lead.instrument === 'stimme' ? 1 : 0) &&
+    [...distinct.values()].every((c) => c === lead || c.position > lead.position);
+  if (!alternativeList && (listed >= SCORE_PARTS || families.size >= SCORE_PARTS)) {
     return { kind: 'partitur', confidence: Math.min(1, 0.5 + listed * 0.1), candidates };
   }
 
@@ -82,6 +90,8 @@ export function classifyText(text: string, opts: MatchOptions = {}): Classificat
     if (bare && TITLE_PRONE.has(c.instrument)) continue;
     if (c.instrument === 'stimme' && !c.numbers.length) continue;
     const p = toPart(c);
+    // "1. Stimme in B (Flügelhorn 1, Trompete 1)": die genannten Instrumente lesen aus dieser Stimmung
+    if (!p.key && part.key) p.key = part.key;
     if (!also.some((x) => partKey(x) === partKey(p))) also.push(p);
   }
   return { kind, part, alsoParts: also.length ? also : undefined, confidence: best.confidence, candidates, weak: best.abbrev || undefined };

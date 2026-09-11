@@ -100,3 +100,25 @@ kbd { font-family: inherit; padding: 1px 5px; border: 1px solid var(--border); b
 .chip.recent { background: var(--border); color: var(--text); font-weight: 500; padding-left: 4px; }
 .chip.recent .recent-open { border: 0; background: transparent; color: var(--accent); cursor: pointer; font: inherit; font-weight: 600; padding: 2px 6px; }
 .chip.recent .recent-open:hover { text-decoration: underline; }
+
+.start { max-width: 860px; margin: 40px auto 0; }
+.start h1 { font-size: 22px; margin: 0 0 6px; }
+.start .lead { color: var(--muted); margin: 0 0 24px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+.tile { display: block; text-align: left; padding: 22px 22px 20px; border: 1px solid var(--border); border-radius: 12px; background: var(--panel); color: var(--text); cursor: pointer; transition: .15s; }
+.tile:hover, .tile:focus-visible { border-color: var(--accent); box-shadow: 0 6px 24px rgba(37,99,235,.12); outline: none; }
+.tile .icon { font-size: 30px; line-height: 1; margin-bottom: 12px; }
+.tile h3 { margin: 0 0 6px; font-size: 16px; }
+.tile p { margin: 0; color: var(--muted); font-size: 13px; }
+.tile .scheme { margin-top: 12px; font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: var(--muted); background: var(--bg); padding: 6px 8px; border-radius: 6px; white-space: pre; }
+.brand.clickable { cursor: pointer; }
+.brand.clickable:hover { color: var(--accent); }
+.bucket { margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--border); }
+.bucket-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.bucket-head b { font-size: 13px; }
+.piece.skipped { opacity: .75; }
+table.plan { width: 100%; border-collapse: collapse; font-size: 13px; }
+table.plan td, table.plan th { padding: 5px 8px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+table.plan th { color: var(--muted); font-weight: 600; }
+/* Screenshot-Modus für die Doku: Notenzeilen der Miniaturen unkenntlich machen */
+.blur-notes .thumb img { filter: blur(5px); }

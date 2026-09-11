@@ -2,9 +2,10 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { INSTRUMENTS, formatPart } from '@shared/instruments';
 import { parseQuery } from '@shared/matcher';
 import type { FileInfo } from '@shared/ipc-types';
-import { formatBytes, type Query } from '../state';
+import { formatBytes, type Mode, type Query } from '../state';
 
 interface Props {
+  mode: Mode;
   files: FileInfo[];
   setFiles: (f: FileInfo[]) => void;
   queries: Query[];
@@ -24,7 +25,7 @@ for (const inst of INSTRUMENTS) {
 }
 SUGGESTIONS.push('1. Stimme', '2. Stimme', '3. Stimme', '4. Stimme');
 
-export default function Auswahl({ files, setFiles, queries, setQueries, onStart, recentInputs, onRecentChange }: Props) {
+export default function Auswahl({ mode, files, setFiles, queries, setQueries, onStart, recentInputs, onRecentChange }: Props) {
   const [over, setOver] = useState(false);
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
@@ -99,13 +100,13 @@ export default function Auswahl({ files, setFiles, queries, setQueries, onStart,
   }
 
   const validQueries = queries.filter((q) => q.part);
-  const canStart = files.length > 0 && validQueries.length > 0 && !busy;
+  const canStart = files.length > 0 && (mode === 'aufteilen' || validQueries.length > 0) && !busy;
   const totalSize = files.reduce((n, f) => n + f.size, 0);
 
   return (
     <>
       <div className="panel">
-        <h2>1. Noten auswählen</h2>
+        <h2>{mode === 'suchen' ? '1. Noten auswählen' : 'Noten auswählen'}</h2>
         <div
           className={'dropzone' + (over ? ' over' : '')}
           onDragOver={(e) => { e.preventDefault(); setOver(true); }}
@@ -159,7 +160,13 @@ export default function Auswahl({ files, setFiles, queries, setQueries, onStart,
         )}
       </div>
 
-      <div className="panel">
+      {mode === 'aufteilen' && (
+        <p className="hint" style={{ marginTop: -8, marginBottom: 16 }}>
+          Jedes Stück wird in eine PDF pro Stimme zerlegt. Partiturseiten kommen in „Partitur.pdf“, Seiten ohne erkannte Stimme in „Sonstiges.pdf“.
+        </p>
+      )}
+
+      {mode === 'suchen' && <div className="panel">
         <h2>2. Gesuchte Stimmen</h2>
         <div className="row" style={{ position: 'relative' }}>
           <div style={{ position: 'relative' }}>
@@ -194,11 +201,13 @@ export default function Auswahl({ files, setFiles, queries, setQueries, onStart,
           ))}
           {queries.length === 0 && <span className="muted">Noch keine Stimme gewählt.</span>}
         </div>
-      </div>
+      </div>}
 
       <div className="footer-actions">
         <button className="btn primary" disabled={!canStart} onClick={onStart}>
-          Analysieren ({files.length} PDFs, {validQueries.length} Stimme{validQueries.length === 1 ? '' : 'n'})
+          {mode === 'suchen'
+            ? `Analysieren (${files.length} PDFs, ${validQueries.length} Stimme${validQueries.length === 1 ? '' : 'n'})`
+            : `Analysieren (${files.length} PDF${files.length === 1 ? '' : 's'})`}
         </button>
       </div>
     </>

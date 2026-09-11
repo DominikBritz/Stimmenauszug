@@ -17,6 +17,13 @@ Alltag im Notenarchiv: Ein Ordner voller Stücke als PDF, jedes mit allen Stimme
 
 ## Was es kann
 
+Zwei Werkzeuge, wählbar auf der Startseite:
+
+- **Stimmen heraussuchen:** Eine oder mehrere Stimmen aus allen Stücken finden, je Stimme eine PDF mit Lesezeichen pro Stück. Für die Notenmappe.
+- **Stimmen aufteilen:** Jedes Stück in eine PDF pro Stimme zerlegen, benannt nach der Stimme („Trompete 1 in B.pdf“), pro Stück ein Unterordner. Partiturseiten kommen in „Partitur.pdf“, Seiten ohne erkannte Stimme in „Sonstiges.pdf“. Unterordner des Eingabeordners werden gespiegelt, Dateien, die schon eine Einzelstimme sind, werden übersprungen. Für das Notenarchiv.
+
+Beiden gemeinsam:
+
 - **Gescannte Noten.** Texterkennung (OCR) direkt in der App, Deutsch und Englisch, ohne Cloud. Textlayer werden genutzt, wenn vorhanden.
 - **Uneinheitliche Bezeichnungen.** „Trompete 1“, „1. Trompete“, „Trumpet 1“, „Tromba I“, „Trp. 1“, „1st Bb Trumpet“ landen alle beim selben Ergebnis. Eigene Aliase wie „1. Stimme (B)“ → „Trompete 1“ sind möglich.
 - **Partituren werden erkannt** und ausgelassen, auch Folgeseiten ohne Überschrift.
@@ -29,6 +36,10 @@ Alltag im Notenarchiv: Ein Ordner voller Stücke als PDF, jedes mit allen Stimme
 
 ## So sieht es aus
 
+**Start:** Werkzeug wählen.
+
+![Start](docs/screenshots/start.png)
+
 **Auswahl:** Ordner oder Dateien hineinziehen, Stimmen eintragen.
 
 ![Auswahl](docs/screenshots/auswahl.png)
@@ -40,6 +51,10 @@ Alltag im Notenarchiv: Ein Ordner voller Stücke als PDF, jedes mit allen Stimme
 **Großansicht:** Ein Klick auf eine Miniatur zeigt die Seite in voller Größe mit dem erkannten Text.
 
 ![Großansicht](docs/screenshots/vorschau.png)
+
+**Aufteilen:** Pro Stück die erkannten Abschnitte, jede Zeile wird eine Datei. Hinweise bei unsicheren Seiten, mehrfach vorkommenden Stimmen und Zweitstimmen.
+
+![Aufteilen](docs/screenshots/aufteilen.png)
 
 *Die Notenzeilen in den Screenshots sind unkenntlich gemacht. Die gezeigten Noten sind urheberrechtlich geschützte Verlagsausgaben; nur Titel und Stimmenbezeichnung sind sichtbar, um die Funktion zu zeigen.*
 
@@ -94,7 +109,7 @@ Testlauf ohne Oberfläche:
 SE_AUTORUN=/pfad/zu/noten SE_OUT=ergebnis.json SE_QUERY="Trompete 1" npx electron out/main/index.js
 ```
 
-`SE_FORCE=1` ignoriert den Cache, `SE_LIMIT=10` begrenzt die Dateianzahl, `SE_EXPORT=/ziel` exportiert die Treffer, `SE_SCREENSHOT=bild.png` fotografiert die Kontrollansicht.
+`SE_FORCE=1` ignoriert den Cache, `SE_LIMIT=10` begrenzt die Dateianzahl, `SE_EXPORT=/ziel` exportiert die Treffer, `SE_SCREENSHOT=bild.png` fotografiert die Kontrollansicht. `SE_MODE=aufteilen` läuft im Aufteilen-Modus: Der Bericht enthält dann die Buckets je Stück, und `SE_EXPORT` legt die Ordnerstruktur an.
 
 ### Aufbau
 
